@@ -3,29 +3,41 @@
 
 Project structure
 ```
-istandard/
-├── Dockerfile
-├── docker-compose.yml
+Sevensix-API/
 ├── alembic/
-│   ├── env.py
+│   ├── README
 │   ├── script.py.mako
 │   └── versions/
 ├── alembic.ini
 ├── app/
+│   ├── __init__.py
 │   ├── main.py
 │   ├── accounts/
-│   │   ├── auth.py
-│   │   ├── models.py
+│   │   ├── __init__.py
+│   │   ├── models/
 │   │   ├── permissions.py
-│   │   ├── routes.py
-│   │   └── schemas.py
-│   ├── config/
-│   │   ├── database.py
-│   │   └── settings.py
-├── utils/
-├── requirements.txt
-├── .env.example
-└── README.md
+│   │   ├── routes/
+│   │   ├── schemas/
+│   │   └── services/
+│   ├── chat/
+│   │   ├── __init__.py
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── utils/
+│   └── config/
+│       ├── __init__.py
+│       ├── database.py
+│       └── settings.py
+├── docker-compose.yml
+├── Dockerfile
+├── LICENSE
+├── private_chroma_db/
+│   └── chroma.sqlite3
+├── public_chroma_db/
+│   └── chroma.sqlite3
+├── README.md
 ```
 
 # How to run the project

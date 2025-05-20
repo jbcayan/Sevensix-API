@@ -159,4 +159,15 @@ cython_debug/
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+#.idea/!/private_chroma_db/chroma.sqlite3
+# Ignore all common database files everywhere
+*.sqlite3
+*.db
+*.sqlite
+*.sql
+*.db-journal
+*.sqlite3-journal
+
+# Ignore database directories and their contents
+private_chroma_db/
+public_chroma_db/
