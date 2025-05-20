@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings
 from pydantic import Field
 from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,6 +22,8 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = Field("password", env="POSTGRES_PASSWORD")
     POSTGRES_DB: str = Field("db", env="POSTGRES_DB")
 
+    OPENAI_API_KEY: str = Field(..., env="OPENAI_API_KEY")  # <-- Add this line
+
     ALLOWED_ORIGINS_RAW: str = Field("http://localhost,http://localhost:3000", alias="ALLOWED_ORIGINS")
 
     @property
@@ -36,6 +39,10 @@ class Settings(BaseSettings):
             )
         return f"sqlite:///{self.SQLITE_DB_PATH}"
 
+    # --------------------------------------------------------------------------- #
+    # LLM MODEL CONFIGS                                                                                                                          #
+    # --------------------------------------------------------------------------- #
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
@@ -43,4 +50,17 @@ class Settings(BaseSettings):
         extra = "ignore"
 
 settings = Settings()
+
+# 3. Instantiate OpenAI client(s) USING the loaded API key
+#    and OUTSIDE the Settings config class to keep Pydantic happy.
+public_chat_model = ChatOpenAI(
+    model_name="gpt-3.5-turbo",
+    temperature=0,
+    openai_api_key=settings.OPENAI_API_KEY  # <-- Here it is injected
+)
+private_chat_model = ChatOpenAI(
+    model_name="gpt-4o",
+    temperature=0,
+    openai_api_key=settings.OPENAI_API_KEY
+)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="accounts/login")

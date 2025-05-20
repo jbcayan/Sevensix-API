@@ -10,6 +10,8 @@ load_dotenv()
 
 from app.config.database import Base
 from app.accounts.models.user import User
+from app.chat.models.file import File
+from app.chat.models.conversation import Conversation
 
 target_metadata = Base.metadata
 
