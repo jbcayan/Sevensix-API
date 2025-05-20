@@ -27,3 +27,9 @@ class FileOut(FileBase):
 
     class Config:
         from_attributes = True
+
+
+class FileProcessResponse(BaseModel):
+    """Response model for file processing endpoint."""
+    message: str
+    status: str

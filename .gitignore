@@ -171,3 +171,4 @@ cython_debug/
 # Ignore database directories and their contents
 private_chroma_db/
 public_chroma_db/
+uploads/

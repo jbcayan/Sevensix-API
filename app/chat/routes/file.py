@@ -1,19 +1,23 @@
 import os
+import logging
 from typing import List, Dict, Any
 
-from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException, status, Path
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, File, UploadFile, Form, HTTPException, status, Path, BackgroundTasks
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.accounts.models.user import User
 from app.accounts.permissions import get_current_user, admin_required
 from app.chat.models.file import File as FileModel, InfoType
-from app.chat.schemas.file import FileOut
+from app.chat.schemas.file import FileOut, FileProcessResponse
 from app.config.database import get_db
 from app.config.settings import settings
 from app.config import settings as app_settings
+from app.chat.utils.process_file import process_file
 
 BASE_DIR = app_settings.BASE_DIR
+
+logger = logging.getLogger(__name__)
 
 # Create the upload directory if it doesn't exist
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
@@ -118,3 +122,66 @@ async def delete_file(
 
     # Return no content
     return None
+
+
+async def _process_file_background(file_uid: str, db: AsyncSession):
+    """
+    Background task to process a file and update its status in the database.
+    """
+    # Get the file from the database
+    stmt = select(FileModel).where(FileModel.uid == file_uid)
+    result = await db.execute(stmt)
+    file: FileModel | None = result.scalars().first()
+
+    if file is None:
+        logger.error(f"File with UID {file_uid} not found for processing")
+        return
+
+    # Process the file
+    new_status = await process_file(file)
+
+    # Update the file status in the database
+    stmt = update(FileModel).where(FileModel.uid == file_uid).values(status=new_status)
+    await db.execute(stmt)
+    await db.commit()
+
+
+@admin_files_router.post("/{file_uid}/process", response_model=FileProcessResponse)
+async def process_file_endpoint(
+        file_uid: str = Path(..., description="The UID of the file to process"),
+        background_tasks: BackgroundTasks = BackgroundTasks(),
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db)
+):
+    """Process a file to extract text and create embeddings."""
+    # Get the file from the database
+    stmt = select(FileModel).where(FileModel.uid == file_uid)
+    result = await db.execute(stmt)
+    file: FileModel | None = result.scalars().first()
+
+    # Check if file exists
+    if file is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="File not found"
+        )
+
+    # Check if user has permission to process the file
+    if file.user_uid != current_user.uid:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied"
+        )
+
+    # Update status to "Processing"
+    file.status = "Processing"
+    await db.commit()
+
+    # Add the processing task to background tasks
+    background_tasks.add_task(_process_file_background, file_uid, db)
+
+    # Return response
+    return FileProcessResponse(
+        message="File processing started",
+        status="Processing"
+    )

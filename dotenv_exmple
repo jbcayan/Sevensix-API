@@ -25,7 +25,7 @@ JWT_ACCESS_TOKEN_LIFETIME=5m
 JWT_REFRESH_TOKEN_LIFETIME=7d
 
 
-GROQ_API_KEY = your-groq-api-key
-TAVILY_API_KEY= your-tavily-api-key
-OPENAI_API_KEY = your-openai-api-key
+GROQ_API_KEY=your-groq-api-key
+TAVILY_API_KEY=your-tavily-api-key
+OPENAI_API_KEY=your-openai-api-key
 
