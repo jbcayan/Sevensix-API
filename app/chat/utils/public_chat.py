@@ -9,7 +9,7 @@ from langchain.chains import RetrievalQA
 logger = logging.getLogger(__name__)
 
 # Set project base directory relative to this file's location
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+BASE_DIR = app_settings.BASE_DIR
 PUBLIC_DB_PATH = os.path.join(BASE_DIR, "public_chroma_db")
 
 COLLECTION_NAME = "PUBLIC_CHAT_COLLECTION"

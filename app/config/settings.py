@@ -9,6 +9,15 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 # Load environment variables from .env file
 load_dotenv()
 
+
+# Define BASE_DIR - path to the project root directory
+# This goes up 3 levels from the settings.py file to reach the project root
+# settings.py is in app/config/settings.py, so we need to go up 3 levels
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# --------------------------------------------------------------------------- #
+# CONFIGURATION
+# --------------------------------------------------------------------------- #
 class Settings(BaseSettings):
     SECRET_KEY: str = Field(..., env="SECRET_KEY")
     ALGORITHM: str = Field("HS256", env="ALGORITHM")

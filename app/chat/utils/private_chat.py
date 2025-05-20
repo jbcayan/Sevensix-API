@@ -11,7 +11,7 @@ from langchain.chains import RetrievalQA
 logger = logging.getLogger(__name__)
 
 # Path to persist Chromadb for private chat (relative to project root or setting)
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+BASE_DIR = app_settings.BASE_DIR
 PRIVATE_DB_PATH = os.path.join(BASE_DIR, "private_chroma_db")
 
 COLLECTION_NAME = "PRIVATE_CHAT_COLLECTION"

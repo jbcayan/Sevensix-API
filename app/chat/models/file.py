@@ -11,6 +11,9 @@ from app.chat.utils.private_chat import private_vector_store
 from app.chat.utils.public_chat import public_vector_store
 from app.config.database import Base
 from app.config.settings import settings
+from app.config import settings as app_settings
+
+BASE_DIR = app_settings.BASE_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +39,7 @@ class File(Base):
         return f"{self.filename} ({self.information_type.value})"
 
     def get_upload_path(self) -> str:
-        return os.path.join(settings.BASE_DIR, "uploads", self.filename)
+        return os.path.join(BASE_DIR, "uploads", self.filename)
 
     def delete_embeddings(self) -> bool:
         try:
@@ -67,3 +70,10 @@ class File(Base):
         self.delete_from_filesystem()
         db_session.delete(self)
         db_session.commit()
+
+    async def async_delete(self, db_session):
+        """Async version of delete to ensure embeddings and file are removed before DB deletion."""
+        self.delete_embeddings()
+        self.delete_from_filesystem()
+        await db_session.delete(self)
+        await db_session.commit()

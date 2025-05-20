@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 load_dotenv()
 
+#----------------------------------------------------
+# Initialize all models for migrations
+#----------------------------------------------------
 from app.config.database import Base
 from app.accounts.models.user import User
 from app.chat.models.file import File
@@ -17,6 +20,9 @@ target_metadata = Base.metadata
 
 DATABASE_TYPE = os.getenv("DATABASE_TYPE", "sqlite3")
 
+#----------------------------------------------------
+# Set up database connection
+#----------------------------------------------------
 if DATABASE_TYPE == "postgres":
     POSTGRES_USER = os.getenv("POSTGRES_USER")
     POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
@@ -33,6 +39,10 @@ config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 fileConfig(config.config_file_name)
 
+
+#----------------------------------------------------
+# Run migrations
+#----------------------------------------------------
 def run_migrations_offline():
     context.configure(
         url=DATABASE_URL,

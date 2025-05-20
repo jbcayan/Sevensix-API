@@ -5,6 +5,7 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Enum, String, Integer
+from sqlalchemy.orm import relationship
 from app.config.database import Base
 
 
@@ -34,5 +35,8 @@ class User(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+
+    files = relationship("File", back_populates="user")
+
     def __repr__(self) -> str:  # pragma: no cover
         return f"<User(username={self.username!r}, role={self.role.value})>"
