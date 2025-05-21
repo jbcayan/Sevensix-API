@@ -10,6 +10,7 @@ from app.accounts.models.user import User
 from app.accounts.permissions import get_current_user, admin_required
 from app.chat.models.file import File as FileModel, InfoType
 from app.chat.schemas.file import FileOut, FileProcessResponse
+from app.chat.services.file import process_file_background
 from app.config.database import get_db
 from app.config.settings import settings
 from app.config import settings as app_settings
@@ -124,26 +125,6 @@ async def delete_file(
     return None
 
 
-async def _process_file_background(file_uid: str, db: AsyncSession):
-    """
-    Background task to process a file and update its status in the database.
-    """
-    # Get the file from the database
-    stmt = select(FileModel).where(FileModel.uid == file_uid)
-    result = await db.execute(stmt)
-    file: FileModel | None = result.scalars().first()
-
-    if file is None:
-        logger.error(f"File with UID {file_uid} not found for processing")
-        return
-
-    # Process the file
-    new_status = await process_file(file)
-
-    # Update the file status in the database
-    stmt = update(FileModel).where(FileModel.uid == file_uid).values(status=new_status)
-    await db.execute(stmt)
-    await db.commit()
 
 
 @admin_files_router.post("/{file_uid}/process", response_model=FileProcessResponse)
@@ -178,7 +159,7 @@ async def process_file_endpoint(
     await db.commit()
 
     # Add the processing task to background tasks
-    background_tasks.add_task(_process_file_background, file_uid, db)
+    background_tasks.add_task(process_file_background, file_uid, db)
 
     # Return response
     return FileProcessResponse(
