@@ -15,7 +15,7 @@ class Conversation(Base):
     uid = Column(String, unique=True, index=True,
                  nullable=False, default=lambda: str(uuid.uuid4())
                  )
-    user_uid = Column(String, ForeignKey("users.uid",), nullable=False)
+    user_uid = Column(String, ForeignKey("users.uid", ondelete="SET NULL"), nullable=True)
     user = relationship("User", back_populates="conversations")
 
     conversation_type = Column(SqlEnum(ConversationType), default=ConversationType.PUBLIC)

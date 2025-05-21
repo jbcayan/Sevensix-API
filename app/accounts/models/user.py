@@ -37,6 +37,7 @@ class User(Base):
     )
 
     files = relationship("File", back_populates="user")
+    conversations = relationship("Conversation", back_populates="user")
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"<User(username={self.username!r}, role={self.role.value})>"
