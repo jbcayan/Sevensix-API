@@ -93,7 +93,7 @@ async def lifespan(app: FastAPI):
     await engine.dispose()
 
 app = FastAPI(
-    title="Sevensix API",
+    title="Sevensix API's",
     description="REST API for Sevensix application. Demonstrates backend expertise, modern best practices, and scalable architecture.",
     version="0.1.0",
     lifespan=lifespan,
