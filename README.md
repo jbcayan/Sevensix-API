@@ -46,9 +46,14 @@ Sevensix-API/
 ```bash
   pip install -r requirements.txt
 ```
-2. Run the Server
+2. Run the Server Locally
 ```bash
   uvicorn app.main:app --reload
+```
+### or
+Run the Server in Docker
+```bash
+  docker compose up --build
 ```
 This will start the development server on http://127.0.0.1:8000.
 
